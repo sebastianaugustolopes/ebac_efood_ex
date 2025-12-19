@@ -100,10 +100,16 @@ const SecondaryButton = styled.button`
   }
 `;
 
+// Função para formatar preço em reais
+function formatPrice(price) {
+  return `R$ ${price.toFixed(2).replace('.', ',')}`;
+}
+
 // Componente PaymentForm
-// Props: onFinish - função para finalizar pagamento
+// Props: onFinish - função para finalizar pagamento (recebe os dados do formulário)
 // Props: onBack - função para voltar à entrega
-function PaymentForm({ onFinish, onBack }) {
+// Props: total - valor total do pedido
+function PaymentForm({ onFinish, onBack, total = 0 }) {
   // Estado do formulário
   const [formData, setFormData] = useState({
     cardName: '',
@@ -149,13 +155,13 @@ function PaymentForm({ onFinish, onBack }) {
       return;
     }
 
-    // Finaliza o pedido
-    onFinish();
+    // Finaliza o pedido passando os dados do formulário
+    onFinish(formData);
   };
 
   return (
     <FormContainer onSubmit={handleSubmit}>
-      <FormTitle>Pagamento - Valor a pagar: R$ X,XX</FormTitle>
+      <FormTitle>Pagamento - Valor a pagar: {formatPrice(total)}</FormTitle>
 
       {/* Campo: Nome no cartão */}
       <FieldGroup>
@@ -178,7 +184,7 @@ function PaymentForm({ onFinish, onBack }) {
             type="text"
             id="cardNumber"
             name="cardNumber"
-            placeholder="0000 0000 0000 0000"
+            placeholder="4111 1111 1111 1111"
             value={formData.cardNumber}
             onChange={handleChange}
           />

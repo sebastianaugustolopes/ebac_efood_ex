@@ -85,9 +85,10 @@ function CartSidebar({ isOpen, onClose, onRemove }) {
     }
   };
 
-  // Avança para entrega
+  // Avança para entrega (redireciona para página de checkout)
   const handleContinueToDelivery = () => {
-    setStep('delivery');
+    onClose();
+    navigate('/checkout');
   };
 
   // Avança para pagamento

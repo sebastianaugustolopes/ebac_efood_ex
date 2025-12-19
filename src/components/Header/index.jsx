@@ -81,9 +81,15 @@ function Header({ onCartClick }) {
         </LogoContainer>
 
         {/* Contador do carrinho (clicável) */}
-        <CartCounter onClick={onCartClick}>
-          {cartItemsCount} produto(s) no carrinho
-        </CartCounter>
+        {onCartClick ? (
+          <CartCounter onClick={onCartClick}>
+            {cartItemsCount} produto(s) no carrinho
+          </CartCounter>
+        ) : (
+          <CartCounter as="span" style={{ cursor: 'default' }}>
+            {cartItemsCount} produto(s) no carrinho
+          </CartCounter>
+        )}
       </HeaderWrapper>
     </HeaderContainer>
   );

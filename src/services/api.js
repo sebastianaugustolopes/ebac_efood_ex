@@ -63,3 +63,27 @@ export const fetchRestaurantById = async (id) => {
   }
 };
 
+// Cria um novo pedido
+export const createOrder = async (orderData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Erro ao criar pedido: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao criar pedido:', error);
+    throw error;
+  }
+};
+
