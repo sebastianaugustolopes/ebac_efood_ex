@@ -3,7 +3,9 @@
 
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { theme } from '../../styles/GlobalStyles';
+import { selectCartItemsCount } from '../../store/cartSlice';
 import logo from '../../assets/images/logo.png';
 
 // Container do header
@@ -60,9 +62,11 @@ const CartCounter = styled.button`
 `;
 
 // Componente Header
-// Props: cartItemsCount - número de itens no carrinho
 // Props: onCartClick - função chamada ao clicar no carrinho
-function Header({ cartItemsCount = 0, onCartClick }) {
+function Header({ onCartClick }) {
+  // Obtém a quantidade de itens do carrinho do Redux
+  const cartItemsCount = useSelector(selectCartItemsCount);
+
   return (
     <HeaderContainer>
       <HeaderWrapper>

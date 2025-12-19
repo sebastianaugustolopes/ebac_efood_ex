@@ -1,8 +1,7 @@
-// Página Restaurant - Perfil do restaurante
-// Exibe banner, menu de pizzas e modal de detalhes
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { theme } from '../../styles/GlobalStyles';
 import Header from '../../components/Header';
@@ -11,6 +10,7 @@ import PizzaCard from '../../components/PizzaCard';
 import Modal from '../../components/Modal';
 import CartSidebar from '../../components/Cart/CartSidebar';
 import { fetchRestaurantById } from '../../services/api';
+import { addItem, removeItem, selectCartItemsCount } from '../../store/cartSlice';
 import bannerImage from '../../assets/images/restaurant-banner.jpg';
 
 // Banner do restaurante
@@ -78,10 +78,13 @@ const ErrorMessage = styled.p`
 `;
 
 // Componente Restaurant
-// Props: cartItems, setCartItems para gerenciar carrinho global
-function Restaurant({ cartItems, setCartItems }) {
+function Restaurant() {
   // Obtém o ID do restaurante da URL
   const { id } = useParams();
+  
+  // Dispatch e selectors do Redux
+  const dispatch = useDispatch();
+  const cartItemsCount = useSelector(selectCartItemsCount);
 
   // Estados para gerenciar os dados da API
   const [restaurant, setRestaurant] = useState(null);
@@ -130,19 +133,14 @@ function Restaurant({ cartItems, setCartItems }) {
 
   // Adiciona pizza ao carrinho
   const handleAddToCart = (pizza) => {
-    setCartItems(prev => [...prev, pizza]);
+    dispatch(addItem(pizza));
     // Abre o carrinho automaticamente
     setIsCartOpen(true);
   };
 
   // Remove item do carrinho
   const handleRemoveItem = (index) => {
-    setCartItems(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // Limpa o carrinho
-  const handleClearCart = () => {
-    setCartItems([]);
+    dispatch(removeItem(index));
   };
 
   // Se estiver carregando
@@ -150,7 +148,6 @@ function Restaurant({ cartItems, setCartItems }) {
     return (
       <>
         <Header 
-          cartItemsCount={cartItems.length} 
           onCartClick={() => setIsCartOpen(true)}
         />
         <RestaurantBanner>
@@ -166,7 +163,6 @@ function Restaurant({ cartItems, setCartItems }) {
     return (
       <>
         <Header 
-          cartItemsCount={cartItems.length} 
           onCartClick={() => setIsCartOpen(true)}
         />
         <MainContainer>
@@ -181,7 +177,6 @@ function Restaurant({ cartItems, setCartItems }) {
     <>
       {/* Header com contador do carrinho */}
       <Header 
-        cartItemsCount={cartItems.length} 
         onCartClick={() => setIsCartOpen(true)}
       />
 
@@ -224,9 +219,7 @@ function Restaurant({ cartItems, setCartItems }) {
       <CartSidebar
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
-        items={cartItems}
         onRemove={handleRemoveItem}
-        onClearCart={handleClearCart}
       />
     </>
   );

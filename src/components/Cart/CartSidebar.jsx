@@ -4,7 +4,9 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { theme } from '../../styles/GlobalStyles';
+import { selectCartItems, clearCart } from '../../store/cartSlice';
 import CartItems from './CartItems';
 import DeliveryForm from './DeliveryForm';
 import PaymentForm from './PaymentForm';
@@ -61,12 +63,14 @@ const CloseButton = styled.button`
 // Componente CartSidebar
 // Props: isOpen - controla visibilidade
 // Props: onClose - função para fechar
-// Props: items - itens do carrinho
 // Props: onRemove - função para remover item
-// Props: onClearCart - função para limpar carrinho
-function CartSidebar({ isOpen, onClose, items, onRemove, onClearCart }) {
+function CartSidebar({ isOpen, onClose, onRemove }) {
   // Navegação
   const navigate = useNavigate();
+  
+  // Dispatch e selectors do Redux
+  const dispatch = useDispatch();
+  const items = useSelector(selectCartItems);
 
   // Estado do passo atual: 'cart' | 'delivery' | 'payment'
   const [step, setStep] = useState('cart');
@@ -104,7 +108,7 @@ function CartSidebar({ isOpen, onClose, items, onRemove, onClearCart }) {
   // Finaliza o pedido
   const handleFinishOrder = () => {
     // Limpa o carrinho e redireciona
-    onClearCart();
+    dispatch(clearCart());
     onClose();
     navigate('/order-success');
   };

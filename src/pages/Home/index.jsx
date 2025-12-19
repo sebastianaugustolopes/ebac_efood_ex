@@ -2,6 +2,7 @@
 // Exibe header, banner, grid de restaurantes e footer
 
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { theme } from '../../styles/GlobalStyles';
 import Header from '../../components/Header';
@@ -9,6 +10,7 @@ import Footer from '../../components/Footer';
 import RestaurantCard from '../../components/RestaurantCard';
 import CartSidebar from '../../components/Cart/CartSidebar';
 import { fetchRestaurants } from '../../services/api';
+import { removeItem } from '../../store/cartSlice';
 
 // Banner da home
 const HeroBanner = styled.section`
@@ -67,8 +69,10 @@ const ErrorMessage = styled.p`
 `;
 
 // Componente Home
-// Props: cartItems, setCartItems para gerenciar carrinho global
-function Home({ cartItems, setCartItems }) {
+function Home() {
+  // Dispatch do Redux
+  const dispatch = useDispatch();
+  
   // Estado do sidebar do carrinho
   const [isCartOpen, setIsCartOpen] = useState(false);
   
@@ -98,19 +102,13 @@ function Home({ cartItems, setCartItems }) {
 
   // Remove item do carrinho
   const handleRemoveItem = (index) => {
-    setCartItems(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // Limpa o carrinho
-  const handleClearCart = () => {
-    setCartItems([]);
+    dispatch(removeItem(index));
   };
 
   return (
     <>
       {/* Header com contador do carrinho */}
       <Header 
-        cartItemsCount={cartItems.length} 
         onCartClick={() => setIsCartOpen(true)}
       />
 
@@ -144,9 +142,7 @@ function Home({ cartItems, setCartItems }) {
       <CartSidebar
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
-        items={cartItems}
         onRemove={handleRemoveItem}
-        onClearCart={handleClearCart}
       />
     </>
   );
