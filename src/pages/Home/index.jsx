@@ -1,14 +1,14 @@
 // Página Home - Lista de restaurantes
 // Exibe header, banner, grid de restaurantes e footer
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '../../styles/GlobalStyles';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import RestaurantCard from '../../components/RestaurantCard';
 import CartSidebar from '../../components/Cart/CartSidebar';
-import restaurants from '../../data/restaurants';
+import { fetchRestaurants } from '../../services/api';
 
 // Banner da home
 const HeroBanner = styled.section`
@@ -50,11 +50,51 @@ const RestaurantGrid = styled.div`
   }
 `;
 
+// Mensagem de loading
+const LoadingMessage = styled.p`
+  text-align: center;
+  color: ${theme.colors.primary};
+  font-size: 18px;
+  padding: 40px;
+`;
+
+// Mensagem de erro
+const ErrorMessage = styled.p`
+  text-align: center;
+  color: ${theme.colors.primary};
+  font-size: 18px;
+  padding: 40px;
+`;
+
 // Componente Home
 // Props: cartItems, setCartItems para gerenciar carrinho global
 function Home({ cartItems, setCartItems }) {
   // Estado do sidebar do carrinho
   const [isCartOpen, setIsCartOpen] = useState(false);
+  
+  // Estados para gerenciar os dados da API
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Busca restaurantes da API ao montar o componente
+  useEffect(() => {
+    const loadRestaurants = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchRestaurants();
+        setRestaurants(data);
+      } catch (err) {
+        setError('Erro ao carregar restaurantes. Tente novamente mais tarde.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRestaurants();
+  }, []);
 
   // Remove item do carrinho
   const handleRemoveItem = (index) => {
@@ -83,14 +123,18 @@ function Home({ cartItems, setCartItems }) {
 
       {/* Grid de restaurantes */}
       <MainContainer>
-        <RestaurantGrid>
-          {restaurants.map(restaurant => (
-            <RestaurantCard 
-              key={restaurant.id} 
-              restaurant={restaurant} 
-            />
-          ))}
-        </RestaurantGrid>
+        {loading && <LoadingMessage>Carregando restaurantes...</LoadingMessage>}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+        {!loading && !error && (
+          <RestaurantGrid>
+            {restaurants.map(restaurant => (
+              <RestaurantCard 
+                key={restaurant.id} 
+                restaurant={restaurant} 
+              />
+            ))}
+          </RestaurantGrid>
+        )}
       </MainContainer>
 
       {/* Footer */}

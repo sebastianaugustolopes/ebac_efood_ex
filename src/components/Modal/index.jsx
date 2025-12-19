@@ -150,9 +150,11 @@ function Modal({ pizza, onClose, onAddToCart }) {
         <ModalContent>
           <ModalTitle>{pizza.name}</ModalTitle>
           <ModalDescription>{pizza.description}</ModalDescription>
-          <ModalDescription>
-            Serve: de 2 a 3 pessoas
-          </ModalDescription>
+          {pizza.porcao && (
+            <ModalDescription>
+              Serve: {pizza.porcao}
+            </ModalDescription>
+          )}
           <ModalPrice>
             {formatPrice(pizza.price)}
           </ModalPrice>

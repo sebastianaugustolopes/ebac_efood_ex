@@ -1,7 +1,7 @@
 // Página Restaurant - Perfil do restaurante
 // Exibe banner, menu de pizzas e modal de detalhes
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { theme } from '../../styles/GlobalStyles';
@@ -10,8 +10,7 @@ import Footer from '../../components/Footer';
 import PizzaCard from '../../components/PizzaCard';
 import Modal from '../../components/Modal';
 import CartSidebar from '../../components/Cart/CartSidebar';
-import restaurants from '../../data/restaurants';
-import pizzas from '../../data/pizzas';
+import { fetchRestaurantById } from '../../services/api';
 import bannerImage from '../../assets/images/restaurant-banner.jpg';
 
 // Banner do restaurante
@@ -62,20 +61,62 @@ const PizzaGrid = styled.div`
   }
 `;
 
+// Mensagem de loading
+const LoadingMessage = styled.p`
+  text-align: center;
+  color: ${theme.colors.white};
+  font-size: 18px;
+  padding: 40px;
+`;
+
+// Mensagem de erro
+const ErrorMessage = styled.p`
+  text-align: center;
+  color: ${theme.colors.primary};
+  font-size: 18px;
+  padding: 40px;
+`;
+
 // Componente Restaurant
 // Props: cartItems, setCartItems para gerenciar carrinho global
 function Restaurant({ cartItems, setCartItems }) {
   // Obtém o ID do restaurante da URL
   const { id } = useParams();
 
-  // Busca o restaurante pelo ID
-  const restaurant = restaurants.find(r => r.id === parseInt(id));
+  // Estados para gerenciar os dados da API
+  const [restaurant, setRestaurant] = useState(null);
+  const [pizzas, setPizzas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Estado do modal de pizza
   const [selectedPizza, setSelectedPizza] = useState(null);
 
   // Estado do sidebar do carrinho
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Busca dados do restaurante da API ao montar o componente
+  useEffect(() => {
+    const loadRestaurant = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchRestaurantById(id);
+        setRestaurant(data);
+        // Os pratos vêm no campo 'cardapio' do restaurante
+        setPizzas(data.cardapio || []);
+      } catch (err) {
+        setError('Erro ao carregar restaurante. Tente novamente mais tarde.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      loadRestaurant();
+    }
+  }, [id]);
 
   // Abre modal com detalhes da pizza
   const handlePizzaClick = (pizza) => {
@@ -104,8 +145,24 @@ function Restaurant({ cartItems, setCartItems }) {
     setCartItems([]);
   };
 
-  // Se não encontrar o restaurante
-  if (!restaurant) {
+  // Se estiver carregando
+  if (loading) {
+    return (
+      <>
+        <Header 
+          cartItemsCount={cartItems.length} 
+          onCartClick={() => setIsCartOpen(true)}
+        />
+        <RestaurantBanner>
+          <LoadingMessage>Carregando restaurante...</LoadingMessage>
+        </RestaurantBanner>
+        <Footer />
+      </>
+    );
+  }
+
+  // Se houver erro ou não encontrar o restaurante
+  if (error || !restaurant) {
     return (
       <>
         <Header 
@@ -113,7 +170,7 @@ function Restaurant({ cartItems, setCartItems }) {
           onCartClick={() => setIsCartOpen(true)}
         />
         <MainContainer>
-          <p>Restaurante não encontrado.</p>
+          <ErrorMessage>{error || 'Restaurante não encontrado.'}</ErrorMessage>
         </MainContainer>
         <Footer />
       </>
@@ -136,15 +193,19 @@ function Restaurant({ cartItems, setCartItems }) {
 
       {/* Grid de pizzas */}
       <MainContainer>
-        <PizzaGrid>
-          {pizzas.map(pizza => (
-            <PizzaCard
-              key={pizza.id}
-              pizza={pizza}
-              onAddClick={handlePizzaClick}
-            />
-          ))}
-        </PizzaGrid>
+        {pizzas.length > 0 ? (
+          <PizzaGrid>
+            {pizzas.map(pizza => (
+              <PizzaCard
+                key={pizza.id}
+                pizza={pizza}
+                onAddClick={handlePizzaClick}
+              />
+            ))}
+          </PizzaGrid>
+        ) : (
+          <ErrorMessage>Nenhum prato disponível no momento.</ErrorMessage>
+        )}
       </MainContainer>
 
       {/* Footer */}
