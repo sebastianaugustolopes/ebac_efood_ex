@@ -1,28 +1,62 @@
-
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
-import { theme } from '../../styles/GlobalStyles';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
-import PizzaCard from '../../components/PizzaCard';
-import Modal from '../../components/Modal';
-import CartSidebar from '../../components/Cart/CartSidebar';
-import { fetchRestaurantById } from '../../services/api';
-import { addItem, removeItem, selectCartItemsCount } from '../../store/cartSlice';
-import bannerImage from '../../assets/images/restaurant-banner.jpg';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
+import { theme } from "../../styles/GlobalStyles";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import PizzaCard from "../../components/PizzaCard";
+import Modal from "../../components/Modal";
+import CartSidebar from "../../components/Cart/CartSidebar";
+import { fetchRestaurantById } from "../../services/api";
+import {
+  addItem,
+  removeItem,
+  selectCartItemsCount,
+} from "../../store/cartSlice";
+import bannerImage from "../../assets/images/restaurant-banner.jpg";
 
 // Banner do restaurante
 const RestaurantBanner = styled.section`
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${bannerImage});
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url(${bannerImage});
   background-size: cover;
-  background-position: center;
-  padding: 24px 16px 32px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  padding: 24px 0 32px;
   min-height: 280px;
   display: flex;
   flex-direction: column;
+  position: relative;
+`;
+
+// Wrapper do banner para alinhar com Header e Cards
+const BannerWrapper = styled.div`
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: space-between;
+  height: 100%;
+  min-height: 280px;
+  position: relative;
+`;
+
+// Container para categoria no topo
+const CategoryContainer = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+`;
+
+// Container para nome na parte inferior
+const NameContainer = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
 `;
 
 // Categoria do restaurante
@@ -30,6 +64,11 @@ const RestaurantCategory = styled.span`
   color: ${theme.colors.white};
   font-size: 32px;
   font-weight: 100;
+  font-style: normal;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-align: left;
+  text-transform: capitalize;
 `;
 
 // Nome do restaurante
@@ -37,6 +76,7 @@ const RestaurantName = styled.h1`
   color: ${theme.colors.white};
   font-size: 32px;
   font-weight: 700;
+  text-align: left;
 `;
 
 // Container principal
@@ -81,7 +121,7 @@ const ErrorMessage = styled.p`
 function Restaurant() {
   // Obtém o ID do restaurante da URL
   const { id } = useParams();
-  
+
   // Dispatch e selectors do Redux
   const dispatch = useDispatch();
   const cartItemsCount = useSelector(selectCartItemsCount);
@@ -109,7 +149,7 @@ function Restaurant() {
         // Os pratos vêm no campo 'cardapio' do restaurante
         setPizzas(data.cardapio || []);
       } catch (err) {
-        setError('Erro ao carregar restaurante. Tente novamente mais tarde.');
+        setError("Erro ao carregar restaurante. Tente novamente mais tarde.");
         console.error(err);
       } finally {
         setLoading(false);
@@ -147,11 +187,11 @@ function Restaurant() {
   if (loading) {
     return (
       <>
-        <Header 
-          onCartClick={() => setIsCartOpen(true)}
-        />
+        <Header onCartClick={() => setIsCartOpen(true)} />
         <RestaurantBanner>
-          <LoadingMessage>Carregando restaurante...</LoadingMessage>
+          <BannerWrapper>
+            <LoadingMessage>Carregando restaurante...</LoadingMessage>
+          </BannerWrapper>
         </RestaurantBanner>
         <Footer />
       </>
@@ -162,11 +202,9 @@ function Restaurant() {
   if (error || !restaurant) {
     return (
       <>
-        <Header 
-          onCartClick={() => setIsCartOpen(true)}
-        />
+        <Header onCartClick={() => setIsCartOpen(true)} />
         <MainContainer>
-          <ErrorMessage>{error || 'Restaurante não encontrado.'}</ErrorMessage>
+          <ErrorMessage>{error || "Restaurante não encontrado."}</ErrorMessage>
         </MainContainer>
         <Footer />
       </>
@@ -176,21 +214,25 @@ function Restaurant() {
   return (
     <>
       {/* Header com contador do carrinho */}
-      <Header 
-        onCartClick={() => setIsCartOpen(true)}
-      />
+      <Header onCartClick={() => setIsCartOpen(true)} />
 
       {/* Banner do restaurante */}
       <RestaurantBanner>
-        <RestaurantCategory>{restaurant.category}</RestaurantCategory>
-        <RestaurantName>{restaurant.name}</RestaurantName>
+        <BannerWrapper>
+          <CategoryContainer>
+            <RestaurantCategory>{restaurant.category}</RestaurantCategory>
+          </CategoryContainer>
+          <NameContainer>
+            <RestaurantName>{restaurant.name}</RestaurantName>
+          </NameContainer>
+        </BannerWrapper>
       </RestaurantBanner>
 
       {/* Grid de pizzas */}
       <MainContainer>
         {pizzas.length > 0 ? (
           <PizzaGrid>
-            {pizzas.map(pizza => (
+            {pizzas.map((pizza) => (
               <PizzaCard
                 key={pizza.id}
                 pizza={pizza}

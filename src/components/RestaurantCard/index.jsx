@@ -52,7 +52,7 @@ const CategoryBadge = styled.span`
 // Conteúdo do card
 const CardContent = styled.div`
   padding: 8px;
-  background-color: ${theme.colors.primaryLight};
+  background-color: ${theme.colors.white};
 `;
 
 // Cabeçalho com título e nota

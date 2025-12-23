@@ -8,29 +8,23 @@ import { theme } from '../../styles/GlobalStyles';
 const ItemsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-`;
-
-// Título do carrinho
-const CartTitle = styled.h2`
-  color: ${theme.colors.primaryLight};
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 16px;
+  gap: 8px;
 `;
 
 // Item individual
 const CartItem = styled.div`
   display: flex;
-  gap: 8px;
-  background-color: ${theme.colors.primaryLight};
-  padding: 8px;
+  gap: 12px;
+  background-color: #ffebd9;
+  padding: 12px;
+  align-items: center;
+  position: relative;
 `;
 
 // Imagem do item
 const ItemImage = styled.img`
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   object-fit: cover;
 `;
 
@@ -39,29 +33,35 @@ const ItemInfo = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 4px;
 `;
 
 // Nome do item
 const ItemName = styled.h3`
-  color: ${theme.colors.primary};
-  font-size: 18px;
+  color: #e57373;
+  font-size: 16px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin: 0;
 `;
 
 // Preço do item
 const ItemPrice = styled.p`
-  color: ${theme.colors.primary};
+  color: #e57373;
   font-size: 14px;
+  margin: 0;
 `;
 
 // Botão de remover
 const RemoveButton = styled.button`
   background: none;
-  color: ${theme.colors.primary};
-  font-size: 20px;
-  align-self: flex-end;
-  padding: 0 8px;
+  border: none;
+  color: #e57373;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
 
   &:hover {
     opacity: 0.7;
@@ -73,26 +73,37 @@ const TotalContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 24px;
-  padding-top: 16px;
+  margin-top: 16px;
+  padding: 0 4px;
 `;
 
 // Texto do total
-const TotalText = styled.p`
-  color: ${theme.colors.primaryLight};
+const TotalLabel = styled.p`
+  color: ${theme.colors.white};
   font-size: 14px;
   font-weight: 700;
+  margin: 0;
+`;
+
+// Valor do total
+const TotalValue = styled.p`
+  color: ${theme.colors.white};
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
 `;
 
 // Botão de continuar
 const ContinueButton = styled.button`
   width: 100%;
-  background-color: ${theme.colors.primaryLight};
-  color: ${theme.colors.primary};
+  background-color: #ffebd9;
+  color: #e57373;
   font-size: 14px;
-  font-weight: 700;
-  padding: 4px;
-  margin-top: 16px;
+  font-weight: 600;
+  padding: 12px;
+  margin-top: 12px;
+  border: none;
+  cursor: pointer;
   transition: opacity 0.3s ease;
 
   &:hover {
@@ -107,10 +118,11 @@ const ContinueButton = styled.button`
 
 // Mensagem de carrinho vazio
 const EmptyMessage = styled.p`
-  color: ${theme.colors.primaryLight};
+  color: ${theme.colors.white};
   font-size: 14px;
   text-align: center;
   padding: 32px 0;
+  margin: 0;
 `;
 
 // Função para formatar preço em reais
@@ -128,8 +140,6 @@ function CartItems({ items, onRemove, onContinue }) {
 
   return (
     <ItemsContainer>
-      <CartTitle>Carrinho</CartTitle>
-
       {/* Lista de itens ou mensagem vazia */}
       {items.length === 0 ? (
         <EmptyMessage>
@@ -148,15 +158,15 @@ function CartItems({ items, onRemove, onContinue }) {
                 onClick={() => onRemove(index)}
                 aria-label="Remover item"
               >
-                🗑
+                🗑️
               </RemoveButton>
             </CartItem>
           ))}
 
           {/* Total */}
           <TotalContainer>
-            <TotalText>Valor total</TotalText>
-            <TotalText>{formatPrice(total)}</TotalText>
+            <TotalLabel>Valor total</TotalLabel>
+            <TotalValue>{formatPrice(total)}</TotalValue>
           </TotalContainer>
 
           {/* Botão de continuar */}

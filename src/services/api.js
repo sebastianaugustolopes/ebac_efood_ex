@@ -48,7 +48,21 @@ export const fetchRestaurants = async () => {
 // Busca um restaurante específico por ID
 export const fetchRestaurantById = async (id) => {
   try {
-    // Primeiro busca todos os restaurantes e depois filtra pelo ID
+    // Tenta buscar diretamente pelo endpoint específico
+    try {
+      const response = await fetch(`${API_BASE_URL}/restaurantes/${id}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        const restaurant = data.value || data;
+        return transformRestaurant(restaurant);
+      }
+    } catch (directFetchError) {
+      // Se não existir endpoint específico, busca todos e filtra
+      console.log('Endpoint específico não disponível, buscando todos os restaurantes...');
+    }
+    
+    // Fallback: busca todos os restaurantes e filtra pelo ID
     const restaurants = await fetchRestaurants();
     const restaurant = restaurants.find(r => r.id === parseInt(id));
     

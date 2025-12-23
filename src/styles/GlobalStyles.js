@@ -32,6 +32,7 @@ const GlobalStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: ${theme.fonts.primary};
   }
 
   /* Estilos do body */
@@ -41,6 +42,11 @@ const GlobalStyles = createGlobalStyle`
     color: ${theme.colors.text};
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Garante que todos os elementos de texto usem Roboto */
+  h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, textarea, select, label {
+    font-family: ${theme.fonts.primary};
   }
 
   /* Remove estilos padrão de listas */

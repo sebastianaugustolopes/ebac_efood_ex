@@ -2,12 +2,13 @@
 // Exibe logo e ícones de redes sociais
 
 import styled from 'styled-components';
+import { Instagram, Facebook, Twitter } from 'lucide-react';
 import { theme } from '../../styles/GlobalStyles';
 import logo from '../../assets/images/logo.png';
 
 // Container do footer
 const FooterContainer = styled.footer`
-  background-color: ${theme.colors.primaryLight};
+  background-color: #FFEBD9;
   padding: 40px 0;
   margin-top: auto;
 `;
@@ -44,9 +45,23 @@ const SocialIcon = styled.a`
   align-items: center;
   justify-content: center;
   transition: opacity 0.3s ease;
+  color: ${theme.colors.white};
+  position: relative;
 
   &:hover {
     opacity: 0.8;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 `;
 
@@ -69,14 +84,14 @@ function Footer() {
 
         {/* Ícones de redes sociais */}
         <SocialIcons>
-          <SocialIcon href="#" aria-label="Instagram">
-            {/* Ícone simplificado */}
+          <SocialIcon href="#" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+            <Instagram />
           </SocialIcon>
-          <SocialIcon href="#" aria-label="Facebook">
-            {/* Ícone simplificado */}
+          <SocialIcon href="#" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+            <Facebook />
           </SocialIcon>
-          <SocialIcon href="#" aria-label="Twitter">
-            {/* Ícone simplificado */}
+          <SocialIcon href="#" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+            <Twitter />
           </SocialIcon>
         </SocialIcons>
 

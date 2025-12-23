@@ -10,15 +10,15 @@ import logo from '../../assets/images/logo.png';
 
 // Container do header
 const HeaderContainer = styled.header`
-  background-color: ${theme.colors.background};
-  padding: 24px 0;
+  background-color: #FFEBD9;
+  padding: 24px;
 `;
 
 // Wrapper interno para centralizar conteúdo
 const HeaderWrapper = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;

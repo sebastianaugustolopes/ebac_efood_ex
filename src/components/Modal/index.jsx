@@ -1,8 +1,8 @@
 // Componente Modal - Modal reutilizável
 // Exibe detalhes de uma pizza com opção de adicionar ao carrinho
 
-import styled from 'styled-components';
-import { theme } from '../../styles/GlobalStyles';
+import styled from "styled-components";
+import { theme } from "../../styles/GlobalStyles";
 
 // Overlay escuro de fundo
 const Overlay = styled.div`
@@ -21,7 +21,7 @@ const Overlay = styled.div`
 
 // Container do modal
 const ModalContainer = styled.div`
-  background-color: ${theme.colors.primary};
+  background-color: #e66767;
   max-width: 1024px;
   width: 100%;
   display: flex;
@@ -89,23 +89,18 @@ const ModalDescription = styled.p`
   margin-bottom: 16px;
 `;
 
-// Preço
-const ModalPrice = styled.p`
-  color: ${theme.colors.white};
-  font-size: 14px;
-  font-weight: 400;
-  margin-bottom: 16px;
-`;
-
-// Botão de adicionar
+// Botão de adicionar com preço
 const AddButton = styled.button`
-  background-color: ${theme.colors.primaryLight};
-  color: ${theme.colors.primary};
+  background-color: #ffebd9;
+  color: #e66767;
+  border: 1px solid #e66767;
   font-size: 14px;
   font-weight: 700;
-  padding: 4px 8px;
-  align-self: flex-start;
+  padding: 8px 16px;
   transition: opacity 0.3s ease;
+  margin-top: auto;
+  align-self: flex-start;
+  cursor: pointer;
 
   &:hover {
     opacity: 0.9;
@@ -114,7 +109,7 @@ const AddButton = styled.button`
 
 // Função para formatar preço em reais
 function formatPrice(price) {
-  return `R$ ${price.toFixed(2).replace('.', ',')}`;
+  return `R$ ${price.toFixed(2).replace(".", ",")}`;
 }
 
 // Componente Modal
@@ -151,15 +146,10 @@ function Modal({ pizza, onClose, onAddToCart }) {
           <ModalTitle>{pizza.name}</ModalTitle>
           <ModalDescription>{pizza.description}</ModalDescription>
           {pizza.porcao && (
-            <ModalDescription>
-              Serve: {pizza.porcao}
-            </ModalDescription>
+            <ModalDescription>Serve: {pizza.porcao}</ModalDescription>
           )}
-          <ModalPrice>
-            {formatPrice(pizza.price)}
-          </ModalPrice>
           <AddButton onClick={handleAddToCart}>
-            Adicionar ao carrinho
+            Adicionar ao carrinho - {formatPrice(pizza.price)}
           </AddButton>
         </ModalContent>
       </ModalContainer>
