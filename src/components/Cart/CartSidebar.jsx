@@ -1,15 +1,15 @@
 // Componente CartSidebar - Sidebar do carrinho
 // Gerencia os passos: carrinho, entrega e pagamento
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { theme } from '../../styles/GlobalStyles';
 import { selectCartItems, clearCart } from '../../store/cartSlice';
 import CartItems from './CartItems';
 import DeliveryForm from './DeliveryForm';
 import PaymentForm from './PaymentForm';
+import OrderSuccessContent from './OrderSuccessContent';
 
 // Overlay escuro de fundo
 const Overlay = styled.div`
@@ -65,30 +65,52 @@ const CloseButton = styled.button`
 // Props: onClose - função para fechar
 // Props: onRemove - função para remover item
 function CartSidebar({ isOpen, onClose, onRemove }) {
-  // Navegação
-  const navigate = useNavigate();
-  
   // Dispatch e selectors do Redux
   const dispatch = useDispatch();
   const items = useSelector(selectCartItems);
 
-  // Estado do passo atual: 'cart' | 'delivery' | 'payment'
+  // Estado do passo atual: 'cart' | 'delivery' | 'payment' | 'success'
   const [step, setStep] = useState('cart');
 
   // Estado dos dados de entrega
   const [deliveryData, setDeliveryData] = useState(null);
 
+  // Estado dos dados do pedido finalizado
+  const [orderData, setOrderData] = useState(null);
+
+  // Calcula o total do carrinho
+  const total = items.reduce((sum, item) => sum + item.price, 0);
+
+  // Reseta o step quando o sidebar abre
+  useEffect(() => {
+    if (isOpen) {
+      if (orderData) {
+        // Se há dados de pedido, mostra tela de sucesso
+        setStep('success');
+      } else {
+        // Se não há dados, volta para carrinho
+        setStep('cart');
+      }
+    }
+  }, [isOpen, orderData]);
+
+  // Reseta o step quando o sidebar fecha
+  const handleClose = () => {
+    setStep('cart');
+    setOrderData(null);
+    onClose();
+  };
+
   // Fecha ao clicar no overlay
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
   };
 
-  // Avança para entrega (redireciona para página de checkout)
+  // Avança para entrega (exibe formulário no sidebar)
   const handleContinueToDelivery = () => {
-    onClose();
-    navigate('/checkout');
+    setStep('delivery');
   };
 
   // Avança para pagamento
@@ -107,11 +129,17 @@ function CartSidebar({ isOpen, onClose, onRemove }) {
   };
 
   // Finaliza o pedido
-  const handleFinishOrder = () => {
-    // Limpa o carrinho e redireciona
+  const handleFinishOrder = (orderResponse) => {
+    // Limpa o carrinho
     dispatch(clearCart());
-    onClose();
-    navigate('/order-success');
+    // Salva os dados do pedido e muda para step de sucesso
+    setOrderData(orderResponse);
+    setStep('success');
+  };
+
+  // Handler para concluir (fecha o sidebar)
+  const handleConclude = () => {
+    handleClose();
   };
 
   // Não renderiza se não estiver aberto
@@ -119,7 +147,7 @@ function CartSidebar({ isOpen, onClose, onRemove }) {
 
   return (
     <Overlay onClick={handleOverlayClick}>
-      <CloseButton onClick={onClose} aria-label="Fechar carrinho">
+      <CloseButton onClick={handleClose} aria-label="Fechar carrinho">
         ✕
       </CloseButton>
 
@@ -146,6 +174,16 @@ function CartSidebar({ isOpen, onClose, onRemove }) {
           <PaymentForm
             onFinish={handleFinishOrder}
             onBack={handleBackToDelivery}
+            total={total}
+            deliveryData={deliveryData}
+            cartItems={items}
+          />
+        )}
+
+        {step === 'success' && orderData && (
+          <OrderSuccessContent
+            orderData={orderData}
+            onConclude={handleConclude}
           />
         )}
       </SidebarContainer>

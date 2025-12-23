@@ -40,7 +40,7 @@ const ItemInfo = styled.div`
 const ItemName = styled.h3`
   color: #e57373;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0;
 `;
 

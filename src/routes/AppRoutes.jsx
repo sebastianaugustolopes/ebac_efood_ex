@@ -1,9 +1,8 @@
-// Configuração de rotas 
+// Configuração de rotas
 
 import { Routes, Route } from 'react-router-dom';
 import Home from '../pages/Home';
 import Restaurant from '../pages/Restaurant';
-import Checkout from '../pages/Checkout';
 import OrderSuccess from '../pages/OrderSuccess';
 
 // Componente de rotas
@@ -20,12 +19,6 @@ function AppRoutes() {
       <Route 
         path="/restaurant/:id" 
         element={<Restaurant />} 
-      />
-
-      {/* Página de checkout - entrega e pagamento */}
-      <Route 
-        path="/checkout" 
-        element={<Checkout />} 
       />
 
       {/* Página de sucesso do pedido */}

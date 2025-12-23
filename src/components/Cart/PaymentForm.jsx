@@ -5,6 +5,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import paymentSchema from '../../schemas/paymentSchema';
 import { theme } from '../../styles/GlobalStyles';
+import { createOrder } from '../../services/api';
 
 // Container do formulário
 const FormContainer = styled.form`
@@ -106,10 +107,12 @@ function formatPrice(price) {
 }
 
 // Componente PaymentForm
-// Props: onFinish - função para finalizar pagamento (recebe os dados do formulário)
+// Props: onFinish - função para finalizar pagamento (recebe os dados do formulário e a resposta da API)
 // Props: onBack - função para voltar à entrega
 // Props: total - valor total do pedido
-function PaymentForm({ onFinish, onBack, total = 0 }) {
+// Props: deliveryData - dados de entrega
+// Props: cartItems - itens do carrinho
+function PaymentForm({ onFinish, onBack, total = 0, deliveryData, cartItems }) {
   // Estado do formulário
   const [formData, setFormData] = useState({
     cardName: '',
@@ -138,8 +141,11 @@ function PaymentForm({ onFinish, onBack, total = 0 }) {
     }
   };
 
+  // Estado de loading
+  const [isLoading, setIsLoading] = useState(false);
+
   // Submete o formulário
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Valida com Zod
@@ -155,8 +161,47 @@ function PaymentForm({ onFinish, onBack, total = 0 }) {
       return;
     }
 
-    // Finaliza o pedido passando os dados do formulário
-    onFinish(formData);
+    // Prepara dados do pedido para enviar à API
+    const orderData = {
+      products: cartItems.map(item => ({
+        id: item.id,
+        price: item.price,
+      })),
+      delivery: {
+        receiver: deliveryData?.receiver || '',
+        address: {
+          description: deliveryData?.address || '',
+          city: deliveryData?.city || '',
+          zipCode: deliveryData?.zipCode || '',
+          number: deliveryData?.number || '',
+          complement: deliveryData?.complement || '',
+        },
+      },
+      payment: {
+        card: {
+          name: formData.cardName,
+          number: formData.cardNumber,
+          code: formData.cvv,
+          expires: {
+            month: formData.expiryMonth,
+            year: formData.expiryYear,
+          },
+        },
+      },
+    };
+
+    try {
+      setIsLoading(true);
+      // Faz POST para a API
+      const response = await createOrder(orderData);
+      // Passa a resposta da API para o handler
+      onFinish(response);
+    } catch (error) {
+      console.error('Erro ao finalizar pedido:', error);
+      setErrors({ submit: 'Erro ao finalizar pedido. Tente novamente.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -234,12 +279,19 @@ function PaymentForm({ onFinish, onBack, total = 0 }) {
         </FieldGroup>
       </FieldRow>
 
+      {/* Mensagem de erro de submissão */}
+      {errors.submit && (
+        <ErrorMessage style={{ marginTop: '8px' }}>
+          {errors.submit}
+        </ErrorMessage>
+      )}
+
       {/* Botões */}
       <ButtonContainer>
-        <PrimaryButton type="submit">
-          Finalizar pagamento
+        <PrimaryButton type="submit" disabled={isLoading}>
+          {isLoading ? 'Processando...' : 'Finalizar pagamento'}
         </PrimaryButton>
-        <SecondaryButton type="button" onClick={onBack}>
+        <SecondaryButton type="button" onClick={onBack} disabled={isLoading}>
           Voltar para a edição de endereço
         </SecondaryButton>
       </ButtonContainer>
